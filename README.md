@@ -1,146 +1,176 @@
 # Olist E-commerce Data Warehouse Project
 
 ## Project Overview
-This project implements a data warehouse solution for the Brazilian E-commerce Public Dataset by Olist. The data warehouse transforms Olist's transactional data into a dimensional model optimized for business intelligence and analysis.
+This project demonstrates a comprehensive data warehouse implementation for the Brazilian E-commerce dataset from Olist. It showcases both traditional ETL processes and modern data transformation approaches, combining Python-based ETL, dbt (data build tool) for transformations, and Docker for containerization. The project creates a dimensional model optimized for business intelligence and analysis.
 
-## Data Warehouse Architecture
+## Architecture
+![Data Warehouse Architecture](src/database/diagram/schema.png)
+
+Our data warehouse follows a robust architectural design:
 
 ### Star Schema Design
-Our data warehouse implements a star schema with the following structure:
+The warehouse implements a star schema with:
+- **Central Fact Table**: fact_orders, containing transactional metrics and foreign keys
+- **Dimension Tables**: 
+  - dim_customer (customer demographics)
+  - dim_seller (seller information)
+  - dim_product (product details)
+  - dim_date (time-based analysis)
 
-- **Fact Table**: fact_orders
-  - Contains order transactions with foreign keys to dimension tables
-  - Includes metrics like price and freight value
+### Implementation Approaches
 
-- **Dimension Tables**:
-  - dim_customer: Customer information and demographics
-  - dim_seller: Seller details and locations
-  - dim_product: Product information and categories
-  - dim_date: Date dimension for time-based analysis
+#### 1. Traditional ETL Pipeline
+The base implementation uses Python for:
+- Data extraction from CSV sources
+- Complex transformations
+- Loading into PostgreSQL
+- Data quality validation
+
+#### 2. DBT Implementation
+Our dbt layer provides:
+- SQL-first transformations
+- Automated testing framework
+- Documentation generation
+- Version-controlled transformations
+- Modular model development
+
+#### 3. Docker Containerization
+The containerized environment includes:
+- PostgreSQL database
+- Python ETL application
+- DBT transformations
+- Orchestrated using Docker Compose
 
 ## Project Structure
-
 ```
 ecommerce-data-warehouse/
 ├── config/
 │   └── database.ini          # Database configuration
 ├── data/
-│   ├── processed/            # Transformed data files
-│   └── raw/                  # Original Olist CSV files
-├── notebooks/
-│   └── data_warehouse_analysis.ipynb    # Analysis and visualizations
-├── src/
-│   ├── analysis/
-│   │   └── business_queries.py          # Business intelligence queries
-│   ├── database/
-│   │   ├── connection.py                # Database connection handling
-│   │   └── schema.sql                   # Data warehouse schema definition
-│   ├── etl/
-│   │   ├── extract.py                   # Data extraction from CSV files
-│   │   ├── transform.py                 # Data transformation logic
-│   │   ├── load.py                      # Database loading operations
-│   │   └── pipeline.py                  # ETL orchestration
-│   └── utils/
-│       ├── data_quality.py              # Data quality validation
-│       └── helpers.py                   # Helper functions
-├── tests/                               # Test files
-├── requirements.txt                     # Project dependencies
-└── run.py                              # Main execution script
+│   ├── processed/            # Transformed data
+│   └── raw/                  # Olist CSV files
+├── dbt_olist/               # DBT implementation
+│   ├── models/
+│   │   ├── staging/         # Initial transformations
+│   │   ├── intermediate/    # Helper models
+│   │   ├── dim/            # Dimension tables
+│   │   ├── fact/           # Fact tables
+│   │   └── mart/           # Business-specific models
+│   └── tests/              # Data quality tests
+├── docker/                  # Docker configuration
+│   ├── Dockerfile          # ETL application
+│   ├── Dockerfile.dbt      # DBT environment
+│   └── docker-compose.yml  # Service orchestration
+├── notebooks/              # Analysis notebooks
+├── src/                    # Source code
+└── tests/                  # Test files
 ```
 
 ## Getting Started
 
 ### Prerequisites
-- Python 3.8 or higher
-- PostgreSQL 12 or higher
-- Virtual environment management tool (venv recommended)
+- Docker and Docker Compose
+- Python 3.8+
+- PostgreSQL 12+
+- DBT 1.9.0+
 
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/LeoRigasaki/ecommerce-data-warehouse.git
-   cd ecommerce-data-warehouse
-   ```
+### Installation Options
 
-2. Create and activate virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   # or
-   venv\Scripts\activate     # Windows
-   ```
+#### 1. Using Docker (Recommended)
+```bash
+# Clone the repository
+git clone https://github.com/LeoRigasaki/ecommerce-data-warehouse.git
+cd ecommerce-data-warehouse
 
-3. Install required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Start the containerized environment
+docker-compose up --build
+```
 
-4. Configure database:
-   - Create a PostgreSQL database
-   - Copy config/database.ini.example to config/database.ini
-   - Update database.ini with your credentials
+#### 2. Local Development
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate     # Windows
 
-### Database Setup
-1. Create the database schema:
-   ```bash
-   psql -U your_username -d your_database -f src/database/schema.sql
-   ```
-![Database Schema Diagram](src/database/diagram/schema.png)
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure database
+cp config/database.ini.example config/database.ini
+# Update database.ini with your credentials
+```
+
 ## Usage
 
-### Running the ETL Pipeline
-Execute the complete ETL process:
+### Running the Pipeline
+
+#### Using Docker
 ```bash
+# Run entire pipeline
+docker-compose up
+
+# Run DBT transformations
+docker-compose run dbt run
+```
+
+#### Local Development
+```bash
+# Run Python ETL
 python run.py
+
+# Run DBT models
+cd dbt_olist
+dbt run
 ```
 
-### Data Quality Checks
-Run data quality validations:
-```bash
-python -m src.utils.data_quality
+### Data Analysis
+1. Access the data warehouse:
+```sql
+psql -U dwh_user -d ecommerce_dwh
 ```
 
-### Business Analysis
-Generate business insights:
+2. Run business queries:
 ```bash
 python -m src.analysis.business_queries
 ```
 
-## Data Analysis and Visualization
-The project includes a Jupyter notebook (`notebooks/data_warehouse_analysis.ipynb`) that demonstrates:
-- Order trends analysis
-- Customer segmentation
-- Product category performance
-- Geographical distribution of sales
+3. View DBT documentation:
+```bash
+dbt docs generate
+dbt docs serve
+```
 
 ## Key Features
 
 ### ETL Pipeline
-- Extracts data from multiple CSV files
-- Transforms raw data into dimensional model
-- Loads data into PostgreSQL database
-- Includes data quality validation
+- Robust data extraction and transformation
+- Error handling and logging
+- Data quality validation
+- Incremental loading capability
 
-### Data Quality Checks
-- Validates data completeness
-- Ensures referential integrity
-- Verifies business rules
-- Reports data quality metrics
+### DBT Transformations
+- Modular SQL transformations
+- Built-in testing framework
+- Automated documentation
+- Dependency management
 
-### Business Intelligence
-- Provides pre-built analysis queries
-- Supports custom query development
-- Enables complex business analysis
+### Docker Implementation
+- Containerized services
+- Reproducible environment
+- Easy deployment
+- Scalable architecture
 
-## Future Development
-The main branch serves as the foundation for exploring various data warehousing tools. Future branches will implement:
-- DBT for data transformation
-- Apache Airflow for workflow orchestration
-- Docker for containerization
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+## Development Branches
+- main: Core implementation
+- feature/dbt: DBT transformations
+- feature/docker: Containerization
+- Future: Airflow implementation
 
 ## Acknowledgments
+- DBT community
+- Docker community
+- PostgreSQL community
 - Dataset provided by Olist Store
 - Brazilian E-commerce Public Dataset by Olist on Kaggle
