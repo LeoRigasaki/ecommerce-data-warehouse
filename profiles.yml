@@ -1,0 +1,12 @@
+olist_dw:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: dwh_user
+      password: cls
+      port: 5432
+      dbname: ecommerce_dwh
+      schema: public
+      threads: 4

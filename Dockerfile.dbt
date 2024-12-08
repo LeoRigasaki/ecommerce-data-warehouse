@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+WORKDIR /dbt
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        ssh-client \
+        software-properties-common \
+        make \
+        build-essential \
+        ca-certificates \
+        libpq-dev \
+    && apt-get clean \
+    && rm -rf \
+        /var/lib/apt/lists/* \
+        /tmp/* \
+        /var/tmp/*
+
+COPY dbt_olist/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY dbt_olist .
+
+# Add dbt profile configuration
+COPY profiles.yml /root/.dbt/profiles.yml
+
+ENTRYPOINT ["dbt"]
