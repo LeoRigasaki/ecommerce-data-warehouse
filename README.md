@@ -58,7 +58,7 @@ ecommerce-data-warehouse/
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ecommerce-data-warehouse.git
+   git clone https://github.com/LeoRigasaki/ecommerce-data-warehouse.git
    cd ecommerce-data-warehouse
    ```
 
