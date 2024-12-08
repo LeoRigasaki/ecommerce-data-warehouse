@@ -85,7 +85,7 @@ ecommerce-data-warehouse/
    ```bash
    psql -U your_username -d your_database -f src/database/schema.sql
    ```
-
+![Database Schema Diagram](src/database/diagram/schema.png)
 ## Usage
 
 ### Running the ETL Pipeline
