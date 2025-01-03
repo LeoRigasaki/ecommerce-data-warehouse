@@ -103,6 +103,7 @@ cp config/database.ini.example config/database.ini
 ```
 
 ## Usage
+Each branch contains the different implementaion like Docker, dbt and python based ETL provided below:
 
 ### Running the Pipeline
 
